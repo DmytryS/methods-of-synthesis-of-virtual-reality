@@ -1,0 +1,11 @@
+version: "3"
+services:
+  nginx-arjs:
+    container_name: nginx-arjs
+    image: nginx:latest
+    restart: always
+    ports:
+      - 5050:80
+    volumes:
+      - ./labs:/var/www/html
+      - ./nginx.conf:/etc/nginx/nginx.conf
