@@ -28,8 +28,8 @@ const yFunc = (u, v) => a * v * Math.sqrt(1 - v) * Math.sin(u);
 const zFunc = (u, v) => a * v;
 const a = -3.1, b = -1.8, c = 1, d = 1;
 
-	let uMin = -1, uMax = 2, uRange = uMax - uMin,
-		vMin = -1, vMax = 2, vRange = vMax - vMin,
+	let uMin = -0.5, uMax = 0.75, uRange = uMax - uMin,
+		vMin = -0.5, vMax = 0.75, vRange = vMax - vMin,
 		zMin = -10, zMax = 10, zRange = zMax - zMin;
 
 var scene, camera, renderer, clock, deltaTime, totalTime;
