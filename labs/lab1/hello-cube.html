@@ -168,12 +168,14 @@ function createGeometry() {
 		var x = xFunc(u, v);
 		var y = yFunc(u, v);
 		var z = zFunc(u, v);
+
+		console.log(x,y,z);
 		if (isNaN(x) || isNaN(y) || isNaN(z))
 			vector.set(0, 0, 0);
 		else
 			vector.set(x, y, z);
 	};
-	const graphGeometry = new THREE.ParametricGeometry(meshFunction, 20, 20);
+	const graphGeometry = new THREE.ParametricBufferGeometry(meshFunction, 20, 20);
 
 	graphGeometry.computeBoundingBox();
 	zMin = graphGeometry.boundingBox.min.z;
