@@ -128,8 +128,11 @@ function initialize()
 		opacity: 0.5,
 		side: THREE.DoubleSide
 	});
+	// const material1 = new THREE.MeshBasicMaterial({ map: texture });
+	// material.side = THREE.DoubleSide;
 
-	mesh1 = new THREE.Mesh( geometry1, material1 );
+	// mesh1 = new THREE.Mesh( geometry1, material1 );
+	const mesh1 = new THREE.Mesh(geometry1, material1);
 	// mesh1.position.y = 0.5;
 
 	markerRoot1.add( mesh1 );
@@ -169,13 +172,14 @@ function createGeometry() {
 		var y = yFunc(u, v);
 		var z = zFunc(u, v);
 
-		console.log(x,y,z);
 		if (isNaN(x) || isNaN(y) || isNaN(z))
 			vector.set(0, 0, 0);
 		else
 			vector.set(x, y, z);
+
+		return vector;
 	};
-	const graphGeometry = new THREE.ParametricBufferGeometry(meshFunction, 20, 20);
+	const graphGeometry = new THREE.ParametricGeometry(meshFunction, 20, 20);
 
 	graphGeometry.computeBoundingBox();
 	zMin = graphGeometry.boundingBox.min.z;
