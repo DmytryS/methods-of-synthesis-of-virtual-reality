@@ -97,7 +97,7 @@ function initialize()
 	// create atToolkitContext
 	arToolkitContext = new THREEx.ArToolkitContext({
 		cameraParametersUrl: 'markers/dmytrys-marker.patt',
-		detectionMode: 'mono'
+		type: 'pattern'
 	});
 
 	// copy projection matrix to camera when initialization complete
