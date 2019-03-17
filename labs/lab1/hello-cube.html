@@ -23,6 +23,11 @@
 
 <script>
 
+const xFunc = (u, v) => a * v * Math.sqrt(1 - v) * Math.cos(u);
+const yFunc = (u, v) => a * v * Math.sqrt(1 - v) * Math.sin(u);
+const zFunc = (u, v) => a * v;
+const a = -3.1, b = -1.8, c = 1, d = 1;
+
 var scene, camera, renderer, clock, deltaTime, totalTime;
 
 var arToolkitSource, arToolkitContext;
@@ -112,7 +117,8 @@ function initialize()
 		type: 'pattern', patternUrl: "data/hiro.patt",
 	})
 
-	let geometry1	= new THREE.CubeGeometry(1,1,1);
+	// let geometry1	= new THREE.CubeGeometry(1,1,1);
+	let geometry1 = createGeometry();
 	let material1	= new THREE.MeshNormalMaterial({
 		transparent: true,
 		opacity: 0.5,
@@ -147,6 +153,53 @@ function animate()
 	totalTime += deltaTime;
 	update();
 	render();
+}
+
+function createGeometry() {
+	uRange = uMax - uMin;
+	vRange = vMax - vMin;
+	const meshFunction = function (u0, v0, vector) {
+		var u = uRange * u0 + uMin;
+		var v = vRange * v0 + vMin;
+		var x = xFunc(u, v);
+		var y = yFunc(u, v);
+		var z = zFunc(u, v);
+		if (isNaN(x) || isNaN(y) || isNaN(z))
+			vector.set(0, 0, 0);
+		else
+			vector.set(x, y, z);
+	};
+	const graphGeometry = new THREE.ParametricGeometry(meshFunction, 20, 20);
+
+	graphGeometry.computeBoundingBox();
+	zMin = graphGeometry.boundingBox.min.z;
+	zMax = graphGeometry.boundingBox.max.z;
+	zRange = zMax - zMin;
+	let color, point, face, numberOfSides, vertexIndex;
+
+	const faceIndices = ['a', 'b', 'c', 'd'];
+
+	for (var i = 0; i < graphGeometry.vertices.length; i++) {
+		point = graphGeometry.vertices[i];
+		color = new THREE.Color(0x0000ff);
+		color.setHSL(0.7 * (zMax - point.z) / zRange, 1, 0.5);
+		graphGeometry.colors[i] = color;
+	}
+
+	for (var i = 0; i < graphGeometry.faces.length; i++) {
+		face = graphGeometry.faces[i];
+		numberOfSides = (face instanceof THREE.Face3) ? 3 : 4;
+		for (var j = 0; j < numberOfSides; j++) {
+			vertexIndex = face[faceIndices[j]];
+			face.vertexColors[j] = graphGeometry.colors[vertexIndex];
+		}
+	}
+
+	if (graphMesh) {
+		this.scene.remove(graphMesh);
+	}
+
+	return graphGeometry;
 }
 
 </script>
