@@ -126,7 +126,7 @@ function initialize()
 	});
 
 	mesh1 = new THREE.Mesh( geometry1, material1 );
-	mesh1.position.y = 0.5;
+	// mesh1.position.y = 0.5;
 
 	markerRoot1.add( mesh1 );
 }
@@ -195,9 +195,12 @@ function createGeometry() {
 		}
 	}
 
-	if (graphMesh) {
-		this.scene.remove(graphMesh);
-	}
+	// if (graphMesh) {
+	// 	this.scene.remove(graphMesh);
+	// }
+
+	console.log(graphGeometry);
+
 
 	return graphGeometry;
 }
