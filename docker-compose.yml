@@ -7,5 +7,5 @@ services:
     ports:
       - 5050:80
     volumes:
-      - ./labs:/var/www/html
+      - ./:/var/www/html
       - ./nginx.conf:/etc/nginx/nginx.conf

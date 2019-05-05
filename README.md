@@ -7,3 +7,6 @@ Markers created with https://jeromeetienne.github.io/AR.js/three.js/examples/mar
 - Lab1
   [Page](https://dmytrys.github.io/methods-of-synthesis-of-virtual-reality/labs/lab1/)
   [Marker](https://dmytrys.github.io/methods-of-synthesis-of-virtual-reality/labs/lab1/markers/dmytrys-marker.png)
+
+- Lab2
+  [Page](https://dmytrys.github.io/methods-of-synthesis-of-virtual-reality/labs/lab2/)

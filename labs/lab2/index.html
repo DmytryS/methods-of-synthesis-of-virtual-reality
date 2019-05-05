@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+
+<head>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <title>Hello, AR Cube!</title>
+    <!-- include three.js library -->
+    <script src='../../libs/js/three.js'></script>
+</head>
+
+<body style='margin : 0px; overflow: hidden; font-family: Monospace;'>
+
+<div class="row">
+    <div class="one-half column">
+        <h5>Absolute: <span id="oabsolute">?</span></h5>
+    </div>
+    <div class="one-half column">
+        <h5>Alpha (z): <span id="oalpha">?</span></h5>
+    </div>
+</div>
+<div class="row">
+    <div class="one-half column">
+        <h5>Beta (x): <span id="obeta">?</span></h5>
+    </div>
+    <div class="one-half column">
+        <h5>Gamma (y): <span id="ogamma">?</span></h5>
+    </div>
+</div>
+
+    <script>
+        const width = 640;
+        const height = 480;
+        const xFunc = (u, v) => a * v * Math.sqrt(1 - v) * Math.cos(u);
+        const yFunc = (u, v) => a * v * Math.sqrt(1 - v) * Math.sin(u);
+        const zFunc = (u, v) => a * v;
+        const a = 0.75, b = 1, c = 1, d = 1;
+        const orientation = {
+            alpha: 0,
+            beta: 0,
+            gamma:0
+        };
+
+        let uMin = 0, uMax = 6.286, uRange = uMax - uMin,
+            vMin = -1, vMax = 6.286, vRange = vMax - vMin,
+            zMin = -10, zMax = 10, zRange = zMax - zMin;
+
+        var renderer, clock, deltaTime, totalTime;
+
+        var arToolkitSource, arToolkitContext;
+
+        var markerRoot1, markerRoot2;
+
+        var mesh1;
+        let camera;
+        let scene;
+
+        initialize();
+        // animate();
+
+        function initialize() {
+            scene = new THREE.Scene();
+
+            let ambientLight = new THREE.AmbientLight(0xcccccc, 0.5);
+            scene.add(ambientLight);
+
+            // camera = new THREE.PerspectiveCamera(
+            //     // 45,
+            //     // width / height,
+            //     // 0.5,
+            //     // 20000
+            // );
+            camera =  new THREE.Camera();
+            // scene.add(camera);
+
+            camera.lookAt(scene.position);
+            // camera.position.set(1,1,1);
+            renderer = new THREE.WebGLRenderer({
+                antialias: true,
+                alpha: true
+            });
+            renderer.setClearColor(new THREE.Color('lightgrey'), 0)
+            renderer.setSize(width,height);
+            renderer.domElement.style.position = 'absolute'
+            renderer.domElement.style.top = '0px'
+            renderer.domElement.style.left = '0px'
+            document.body.appendChild(renderer.domElement);
+
+            clock = new THREE.Clock();
+            deltaTime = 0;
+            totalTime = 0;
+
+            ////////////////////////////////////////////////////////////
+            // setup arToolkitSource
+            ////////////////////////////////////////////////////////////
+
+            // arToolkitSource = new THREEx.ArToolkitSource({
+            //     sourceType: 'webcam',
+            // });
+
+            // function onResize() {
+            //     arToolkitSource.onResize()
+            //     arToolkitSource.copySizeTo(renderer.domElement)
+            //     if (arToolkitContext.arController !== null) {
+            //         arToolkitSource.copySizeTo(arToolkitContext.arController.canvas)
+            //     }
+            // }
+
+            // arToolkitSource.init(function onReady() {
+            //     onResize()
+            // });
+
+            // handle resize event
+            // window.addEventListener('resize', function () {
+            //     onResize()
+            // });
+
+            ////////////////////////////////////////////////////////////
+            // setup markerRoots
+            ////////////////////////////////////////////////////////////
+
+            // build markerControls
+            // markerRoot1 = new THREE.Group();
+            // scene.add(markerRoot1);
+            // let markerControls1 = new THREEx.ArMarkerControls(arToolkitContext, markerRoot1, {
+            //     type: 'pattern', patternUrl: "markers/dmytrys-marker.patt",
+            // })
+
+            let geometry1 = createGeometry();
+            let material1 = new THREE.MeshNormalMaterial({
+                side: THREE.DoubleSide
+            });
+
+            const mesh1 = new THREE.Mesh(geometry1, material1);
+
+            mesh1.rotation.x = -90;
+
+            scene.add(mesh1);
+
+            animate();
+            // markerRoot1.add(mesh1);
+        }
+
+
+        // function update() {
+        //     // update artoolkit on every frame
+        //     if (arToolkitSource.ready !== false)
+        //         arToolkitContext.update(arToolkitSource.domElement);
+        // }
+
+
+        function animate() {
+            requestAnimationFrame(animate);
+            // deltaTime = clock.getDelta();
+            // totalTime += deltaTime;
+            // update();
+            renderer.render(scene, camera);
+
+            // console.log(camera.position);
+
+        }
+
+        function createGeometry() {
+            uRange = uMax - uMin;
+            vRange = vMax - vMin;
+            const meshFunction = function (u0, v0, vector) {
+                var u = uRange * u0 + uMin;
+                var v = vRange * v0 + vMin;
+                var x = xFunc(u, v);
+                var y = yFunc(u, v);
+                var z = zFunc(u, v);
+
+                if (isNaN(x) || isNaN(y) || isNaN(z))
+                    vector.set(0, 0, 0);
+                else
+                    vector.set(x, y, z);
+
+                return vector;
+            };
+            const graphGeometry = new THREE.ParametricGeometry(meshFunction, 20, 20);
+
+            graphGeometry.computeBoundingBox();
+            zMin = graphGeometry.boundingBox.min.z;
+            zMax = graphGeometry.boundingBox.max.z;
+            zRange = zMax - zMin;
+            let color, point, face, numberOfSides, vertexIndex;
+
+            const faceIndices = ['a', 'b', 'c', 'd'];
+
+            for (var i = 0; i < graphGeometry.vertices.length; i++) {
+                point = graphGeometry.vertices[i];
+                color = new THREE.Color(0x0000ff);
+                color.setHSL(0.7 * (zMax - point.z) / zRange, 1, 0.5);
+                graphGeometry.colors[i] = color;
+            }
+
+            for (var i = 0; i < graphGeometry.faces.length; i++) {
+                face = graphGeometry.faces[i];
+                numberOfSides = (face instanceof THREE.Face3) ? 3 : 4;
+                for (var j = 0; j < numberOfSides; j++) {
+                    vertexIndex = face[faceIndices[j]];
+                    face.vertexColors[j] = graphGeometry.colors[vertexIndex];
+                }
+            }
+
+            return graphGeometry;
+        }
+
+
+    const oalpha = document.getElementById('oalpha')
+    const obeta = document.getElementById('obeta')
+    const ogamma = document.getElementById('ogamma')
+
+            function onOrientationEvent(e) {
+                    // oabsolute.textContent = e.absolute
+                    oalpha.textContent = e.alpha.toFixed(4)
+                    obeta.textContent = e.beta.toFixed(4)
+                    ogamma.textContent = e.gamma.toFixed(4)
+
+                    orientation.alpha = e.alpha;
+                    orientation.beta = e.beta;
+                    orientation.gamma = e.gamma;
+
+                    // camera.position.set(orientation.alpha, orientation.beta, orientation.gamma);
+                    camera.rotation.set(orientation.alpha, orientation.beta, orientation.gamma);
+                    alert(orientation);
+
+                    // camera.rotation.x = orientation.alpha;
+                    // camera.rotation.y = orientation.beta;
+                    // camera.rotation.z = orientation.gamma;
+                }
+
+         window.addEventListener('deviceorientation', onOrientationEvent, true);
+
+
+
+
+    </script>
+
+</body>
+
+</html>
