@@ -209,7 +209,7 @@
             function onOrientationEvent(e) {
                     // oabsolute.textContent = e.absolute
                     let intervalStart = new Date().getTime();
-
+                alert(new Date().getTime() - intervalStart );
                     if (new Date().getTime() - intervalStart > INTERVAL) {
                         const CONST = 360;
 
