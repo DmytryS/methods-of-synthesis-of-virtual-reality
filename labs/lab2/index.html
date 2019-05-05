@@ -23,6 +23,10 @@
 </div>
 
     <script>
+        const oalpha = document.getElementById('oalpha')
+        const obeta = document.getElementById('obeta')
+        const ogamma = document.getElementById('ogamma')
+
         const INTERVAL = 100;
         let refreshIntervalStart = new Date().getTime();
 
@@ -203,24 +207,15 @@
             return graphGeometry;
         }
 
-
-        const oalpha = document.getElementById('oalpha')
-        const obeta = document.getElementById('obeta')
-        const ogamma = document.getElementById('ogamma')
-
         function onOrientationEvent(e) {
 
             // alert(new Date().getTime() - refreshIntervalStart );
             if (new Date().getTime() - refreshIntervalStart > INTERVAL) {
                 const CONST = 360;
 
-                const alpha = e.alpha / CONST;
-                const beta = e.beta / CONST;
-                const gamma = e.gamma / CONST;
-
-                //  oalpha.textContent = e.alpha.toFixed(4) / CONST;
-                //  obeta.textContent = e.beta.toFixed(4) / CONST;
-                //  ogamma.textContent = e.gamma.toFixed(4) / CONST;
+                const alpha = e.alpha.toFixed(4)  / CONST;
+                const beta = e.beta.toFixed(4)  / CONST;
+                const gamma = e.gamma.toFixed(4)  / CONST;
 
                 oalpha.textContent = alpha;
                 obeta.textContent = beta;
@@ -237,10 +232,6 @@
         }
 
          window.addEventListener('deviceorientation', onOrientationEvent, true);
-
-
-
-
     </script>
 
 </body>
