@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <head>
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <title>Hello, AR Cube!</title>
@@ -8,26 +7,23 @@
 </head>
 
 <body style='margin : 0px; overflow: hidden; font-family: Monospace;'>
-
-
-<div class="row">
-    <div class="one-half column">
-        <h5>Alpha (z): <span id="oalpha">?</span></h5>
+    <div class="row">
+        <div class="one-half column">
+            <h5>Alpha (z): <span id="oalpha">?</span></h5>
+        </div>
+        <div class="one-half column">
+            <h5>Beta (x): <span id="obeta">?</span></h5>
+        </div>
+        <div class="one-half column">
+            <h5>Gamma (y): <span id="ogamma">?</span></h5>
+        </div>
     </div>
-    <div class="one-half column">
-        <h5>Beta (x): <span id="obeta">?</span></h5>
-    </div>
-    <div class="one-half column">
-        <h5>Gamma (y): <span id="ogamma">?</span></h5>
-    </div>
-</div>
-
     <script>
         const oalpha = document.getElementById('oalpha')
         const obeta = document.getElementById('obeta')
         const ogamma = document.getElementById('ogamma')
 
-        const INTERVAL = 100;
+        const REFRESH_INTERVAL = 100;
         let refreshIntervalStart = new Date().getTime();
 
         const width = 640;
@@ -57,7 +53,6 @@
         let scene;
 
         initialize();
-        // animate();
 
         function initialize() {
             scene = new THREE.Scene();
@@ -91,42 +86,6 @@
             deltaTime = 0;
             totalTime = 0;
 
-            ////////////////////////////////////////////////////////////
-            // setup arToolkitSource
-            ////////////////////////////////////////////////////////////
-
-            // arToolkitSource = new THREEx.ArToolkitSource({
-            //     sourceType: 'webcam',
-            // });
-
-            // function onResize() {
-            //     arToolkitSource.onResize()
-            //     arToolkitSource.copySizeTo(renderer.domElement)
-            //     if (arToolkitContext.arController !== null) {
-            //         arToolkitSource.copySizeTo(arToolkitContext.arController.canvas)
-            //     }
-            // }
-
-            // arToolkitSource.init(function onReady() {
-            //     onResize()
-            // });
-
-            // handle resize event
-            // window.addEventListener('resize', function () {
-            //     onResize()
-            // });
-
-            ////////////////////////////////////////////////////////////
-            // setup markerRoots
-            ////////////////////////////////////////////////////////////
-
-            // build markerControls
-            // markerRoot1 = new THREE.Group();
-            // scene.add(markerRoot1);
-            // let markerControls1 = new THREEx.ArMarkerControls(arToolkitContext, markerRoot1, {
-            //     type: 'pattern', patternUrl: "markers/dmytrys-marker.patt",
-            // })
-
             let geometry1 = createGeometry();
             let material1 = new THREE.MeshNormalMaterial({
                 side: THREE.DoubleSide
@@ -139,26 +98,11 @@
             scene.add(mesh1);
 
             animate();
-            // markerRoot1.add(mesh1);
         }
-
-
-        // function update() {
-        //     // update artoolkit on every frame
-        //     if (arToolkitSource.ready !== false)
-        //         arToolkitContext.update(arToolkitSource.domElement);
-        // }
-
 
         function animate() {
             requestAnimationFrame(animate);
-            // deltaTime = clock.getDelta();
-            // totalTime += deltaTime;
-            // update();
             renderer.render(scene, camera);
-
-            // console.log(camera.position);
-
         }
 
         function createGeometry() {
@@ -208,14 +152,12 @@
         }
 
         function onOrientationEvent(e) {
-
-            // alert(new Date().getTime() - refreshIntervalStart );
-            if (new Date().getTime() - refreshIntervalStart > INTERVAL) {
+            if (new Date().getTime() - refreshIntervalStart > REFRESH_INTERVAL) {
                 const CONST = 360;
 
-                const alpha = e.alpha.toFixed(4)  / CONST;
-                const beta = e.beta.toFixed(4)  / CONST;
-                const gamma = e.gamma.toFixed(4)  / CONST;
+                const alpha = e.alpha.toFixed(4) / CONST;
+                const beta = e.beta.toFixed(4) / CONST;
+                const gamma = e.gamma.toFixed(4) / CONST;
 
                 oalpha.textContent = alpha;
                 obeta.textContent = beta;
@@ -231,9 +173,7 @@
             }
         }
 
-         window.addEventListener('deviceorientation', onOrientationEvent, true);
+        window.addEventListener('deviceorientation', onOrientationEvent, true);
     </script>
-
 </body>
-
 </html>
