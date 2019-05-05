@@ -24,6 +24,8 @@
 
     <script>
         const INTERVAL = 1000;
+        let refreshIntervalStart = new Date().getTime();
+
         const width = 640;
         const height = 480;
         const xFunc = (u, v) => a * v * Math.sqrt(1 - v) * Math.cos(u);
@@ -207,9 +209,9 @@
         const ogamma = document.getElementById('ogamma')
 
         function onOrientationEvent(e) {
-            let intervalStart = new Date().getTime();
-            alert(new Date().getTime() - intervalStart );
-            if (new Date().getTime() - intervalStart > INTERVAL) {
+
+            // alert(new Date().getTime() - refreshIntervalStart );
+            if (new Date().getTime() - refreshIntervalStart > INTERVAL) {
                 const CONST = 360;
 
                 e.alpha = e.alpha / CONST;
@@ -226,7 +228,7 @@
 
                 camera.rotation.set(orientation.alpha, orientation.beta, orientation.gamma);
 
-                intervalStart = new Date().getTime();
+                refreshIntervalStart = new Date().getTime();
             }
         }
 
