@@ -214,13 +214,13 @@
             if (new Date().getTime() - refreshIntervalStart > INTERVAL) {
                 const CONST = 360;
 
-                e.alpha = e.alpha / CONST;
-                e.beta = e.beta / CONST;
-                e.gamma = e.gamma / CONST;
+                // e.alpha = e.alpha / CONST;
+                // e.beta = e.beta / CONST;
+                // e.gamma = e.gamma / CONST;
 
-                 oalpha.textContent = e.alpha.toFixed(4);
-                 obeta.textContent = e.beta.toFixed(4)
-                 ogamma.textContent = e.gamma.toFixed(4)
+                 oalpha.textContent = e.alpha.toFixed(4) / CONST;
+                 obeta.textContent = e.beta.toFixed(4) / CONST;
+                 ogamma.textContent = e.gamma.toFixed(4) / CONST;
 
                 orientation.alpha = e.alpha;
                 orientation.beta = e.beta;
