@@ -9,15 +9,11 @@
 
 <body style='margin : 0px; overflow: hidden; font-family: Monospace;'>
 
+
 <div class="row">
-    <div class="one-half column">
-        <h5>Absolute: <span id="oabsolute">?</span></h5>
-    </div>
     <div class="one-half column">
         <h5>Alpha (z): <span id="oalpha">?</span></h5>
     </div>
-</div>
-<div class="row">
     <div class="one-half column">
         <h5>Beta (x): <span id="obeta">?</span></h5>
     </div>
@@ -27,6 +23,7 @@
 </div>
 
     <script>
+        const INTERVAL = 1000;
         const width = 640;
         const height = 480;
         const xFunc = (u, v) => a * v * Math.sqrt(1 - v) * Math.cos(u);
@@ -211,21 +208,32 @@
 
             function onOrientationEvent(e) {
                     // oabsolute.textContent = e.absolute
-                    oalpha.textContent = e.alpha.toFixed(4)
-                    obeta.textContent = e.beta.toFixed(4)
-                    ogamma.textContent = e.gamma.toFixed(4)
+                    let intervalStart = new Date().getTime();
 
-                    orientation.alpha = e.alpha;
-                    orientation.beta = e.beta;
-                    orientation.gamma = e.gamma;
+                    if (new Date().getTime() - intervalStart > INTERVAL) {
+                        const CONST = 360;
 
-                    // camera.position.set(orientation.alpha, orientation.beta, orientation.gamma);
-                    camera.rotation.set(orientation.alpha, orientation.beta, orientation.gamma);
-                    // alert(orientation);
+                        e.alpha = e.alpha / CONST;
+                        e.beta = e.beta / CONST;
+                        e.gamma = e.gamma / CONST;
 
-                    // camera.rotation.x = orientation.alpha;
-                    // camera.rotation.y = orientation.beta;
-                    // camera.rotation.z = orientation.gamma;
+                        oalpha.textContent = e.alpha.toFixed(4);
+                        obeta.textContent = e.beta.toFixed(4)
+                        ogamma.textContent = e.gamma.toFixed(4)
+
+                        orientation.alpha = e.alpha;
+                        orientation.beta = e.beta;
+                        orientation.gamma = e.gamma;
+
+                        // camera.position.set(orientation.alpha, orientation.beta, orientation.gamma);
+                        camera.rotation.set(orientation.alpha, orientation.beta, orientation.gamma);
+                        // alert(orientation);
+
+                        // camera.rotation.x = orientation.alpha;
+                        // camera.rotation.y = orientation.beta;
+                        // camera.rotation.z = orientation.gamma;
+                        intervalStart = new Date().getTime();
+                    }
                 }
 
          window.addEventListener('deviceorientation', onOrientationEvent, true);
