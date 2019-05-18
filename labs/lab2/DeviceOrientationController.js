@@ -439,6 +439,8 @@ var DeviceOrientationController = function(object, domElement) {
 
       // only process non-zero 3-axis data
       if (alpha !== 0 && beta !== 0 && gamma !== 0) {
+        alert(this.useQuaternions);
+
         if (this.useQuaternions) {
           deviceQuat = createQuaternion(alpha, beta, gamma, orient);
         } else {
