@@ -224,20 +224,17 @@
             var alpha, beta, gamma, orient;
             var deviceMatrix;
 
-            return function () {
-                alpha = THREE.Math.degToRad(e.alpha || 0); // Z
-                beta = THREE.Math.degToRad(e.beta || 0); // X'
-                gamma = THREE.Math.degToRad(e.gamma || 0); // Y''
-                orient = THREE.Math.degToRad(screenOrientation || 0); // O
+            alpha = THREE.Math.degToRad(e.alpha || 0); // Z
+            beta = THREE.Math.degToRad(e.beta || 0); // X'
+            gamma = THREE.Math.degToRad(e.gamma || 0); // Y''
+            orient = THREE.Math.degToRad(screenOrientation || 0); // O
 
-                // only process non-zero 3-axis data
-                if (alpha !== 0 && beta !== 0 && gamma !== 0) {
-                    deviceMatrix = createRotationMatrix(alpha, beta, gamma, orient);
-                    deviceQuat.setFromRotationMatrix(deviceMatrix);
-                    camera.quaternion.copy(deviceQuat);
-                }
-
-            };
+            // only process non-zero 3-axis data
+            if (alpha !== 0 && beta !== 0 && gamma !== 0) {
+                deviceMatrix = createRotationMatrix(alpha, beta, gamma, orient);
+                deviceQuat.setFromRotationMatrix(deviceMatrix);
+                camera.quaternion.copy(deviceQuat);
+            }
 
         }
 
