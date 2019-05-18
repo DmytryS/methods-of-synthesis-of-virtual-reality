@@ -164,7 +164,7 @@
             worldTransform.makeRotationFromEuler(worldEuler);
 
             return function (alpha, beta, gamma, screenOrientation) {
-                deviceEuler.set(beta, alpha, - gamma, 'YXZ');
+                deviceEuler.set(- beta, alpha, - gamma, 'YXZ');
 
                 finalMatrix.identity();
 
@@ -186,7 +186,7 @@
         }();
 
         function onOrientationEvent(e) {
-            const alpha = THREE.Math.degToRad(-1*e.alpha || 0); // Z
+            const alpha = THREE.Math.degToRad(e.alpha || 0); // Z
             const beta = THREE.Math.degToRad(e.beta || 0); // X'
             const gamma = THREE.Math.degToRad(e.gamma || 0); // Y''
             const orient = THREE.Math.degToRad(screenOrientation || 0); // O
