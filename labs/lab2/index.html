@@ -229,6 +229,10 @@
             gamma = THREE.Math.degToRad(e.gamma || 0); // Y''
             orient = THREE.Math.degToRad(screenOrientation || 0); // O
 
+            oalpha.textContent = alpha;
+            obeta.textContent = beta;
+            ogamma.textContent = gamma;
+
             // only process non-zero 3-axis data
             if (alpha !== 0 && beta !== 0 && gamma !== 0) {
                 deviceMatrix = createRotationMatrix(alpha, beta, gamma, orient);
