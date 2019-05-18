@@ -236,7 +236,8 @@
 
                 deviceQuat.setFromRotationMatrix(deviceMatrix);
                 alert(deviceQuat);
-                camera.quaternion.copy(deviceQuat);
+                // camera.quaternion.copy(deviceQuat);
+                camera.rotation.getRotationFromMatrix(deviceMatrix);
             }
 
         }
