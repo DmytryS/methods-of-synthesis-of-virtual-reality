@@ -67,6 +67,7 @@
             //     // 20000
             // );
             camera = new THREE.Camera();
+            camera.rotation.order = 'YXZ';
             // scene.add(camera);
 
             camera.lookAt(scene.position);
@@ -81,10 +82,6 @@
             renderer.domElement.style.top = '0px'
             renderer.domElement.style.left = '0px'
             document.body.appendChild(renderer.domElement);
-
-            clock = new THREE.Clock();
-            deltaTime = 0;
-            totalTime = 0;
 
             let geometry1 = createGeometry();
             let material1 = new THREE.MeshNormalMaterial({
