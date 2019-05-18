@@ -164,7 +164,7 @@
             worldTransform.makeRotationFromEuler(worldEuler);
 
             return function (alpha, beta, gamma, screenOrientation) {
-                deviceEuler.set(- beta, alpha, - gamma, 'YXZ');
+                deviceEuler.set(beta, - alpha, - gamma, 'YXZ');
 
                 finalMatrix.identity();
 
