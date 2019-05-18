@@ -38,6 +38,8 @@
             gamma: 0
         };
 
+        let deviceQuat = new THREE.Quaternion();
+
         let uMin = 0, uMax = 6.286, uRange = uMax - uMin,
             vMin = -1, vMax = 6.286, vRange = vMax - vMin,
             zMin = -10, zMax = 10, zRange = zMax - zMin;
@@ -233,10 +235,10 @@
             // only process non-zero 3-axis data
             if (alpha !== 0 && beta !== 0 && gamma !== 0) {
                 deviceMatrix = createRotationMatrix(alpha, beta, gamma, orient);
-
                 deviceQuat.setFromRotationMatrix(deviceMatrix);
+
                 // camera.quaternion.copy(deviceQuat);
-                camera.rotation.getRotationFromMatrix(deviceMatrix);
+                camera.quaternion.copy(deviceQuat);
             }
 
         }
