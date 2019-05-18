@@ -4,6 +4,7 @@
     <title>Hello, AR Cube!</title>
     <!-- include three.js library -->
     <script src='../../libs/js/three.js'></script>
+    <script src="./DeviceOrientationController.js" type="text/javascript"></script>
 </head>
 
 <body style='margin : 0px; overflow: hidden; font-family: Monospace;'>
@@ -18,162 +19,48 @@
             <h5>Gamma (y): <span id="ogamma">?</span></h5>
         </div>
     </div>
+    <div id="label"></div>
+
     <script>
-        const oalpha = document.getElementById('oalpha')
-        const obeta = document.getElementById('obeta')
-        const ogamma = document.getElementById('ogamma')
-
-        const REFRESH_INTERVAL = 100;
-        let refreshIntervalStart = new Date().getTime();
-
-        const width = 640;
-        const height = 480;
-        const xFunc = (u, v) => a * v * Math.sqrt(1 - v) * Math.cos(u);
-        const yFunc = (u, v) => a * v * Math.sqrt(1 - v) * Math.sin(u);
-        const zFunc = (u, v) => a * v;
-        const a = 0.75, b = 1, c = 1, d = 1;
-        const orientation = {
-            alpha: 0,
-            beta: 0,
-            gamma:0
-        };
-
-        let uMin = 0, uMax = 6.286, uRange = uMax - uMin,
-            vMin = -1, vMax = 6.286, vRange = vMax - vMin,
-            zMin = -10, zMax = 10, zRange = zMax - zMin;
-
-        var renderer, clock, deltaTime, totalTime;
-
-        var arToolkitSource, arToolkitContext;
-
-        var markerRoot1, markerRoot2;
-
-        var mesh1;
-        let camera;
-        let scene;
-
-        initialize();
-
-        function initialize() {
+        var camera, scene, renderer, controls;
+        // Setup
+        function init() {
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
+            // Render three.js world
             scene = new THREE.Scene();
+            // Choose a random cuebmap ('2' or '3')
+            const gridHelper = new THREE.GridHelper(100, 10);
+            scene.add(gridHelper);
 
-            let ambientLight = new THREE.AmbientLight(0xcccccc, 0.5);
-            scene.add(ambientLight);
-
-            // camera = new THREE.PerspectiveCamera(
-            //     // 45,
-            //     // width / height,
-            //     // 0.5,
-            //     // 20000
-            // );
-            camera =  new THREE.Camera();
-            // scene.add(camera);
-
-            camera.lookAt(scene.position);
-            // camera.position.set(1,1,1);
+            const axisHelper = new THREE.AxisHelper(50);
+            scene.add(axisHelper);
             renderer = new THREE.WebGLRenderer({
                 antialias: true,
                 alpha: true
             });
-            renderer.setClearColor(new THREE.Color('lightgrey'), 0)
-            renderer.setSize(width,height);
-            renderer.domElement.style.position = 'absolute'
-            renderer.domElement.style.top = '0px'
-            renderer.domElement.style.left = '0px'
+            renderer.setClearColor(new THREE.Color('lightgrey'), 0);
+            renderer.domElement.style.position = 'absolute';
+            renderer.domElement.style.top = '0px';
+            renderer.domElement.style.left = '0px';
+            renderer.setSize(window.innerWidth, window.innerHeight);
             document.body.appendChild(renderer.domElement);
-
-            clock = new THREE.Clock();
-            deltaTime = 0;
-            totalTime = 0;
-
-            let geometry1 = createGeometry();
-            let material1 = new THREE.MeshNormalMaterial({
-                side: THREE.DoubleSide
-            });
-
-            const mesh1 = new THREE.Mesh(geometry1, material1);
-
-            mesh1.rotation.x = -90;
-
-            scene.add(mesh1);
-
-            animate();
+            // Add DeviceOrientation Controls
+            controls = new DeviceOrientationController(camera, renderer.domElement);
+            controls.connect();
+            // setupControllerEventHandlers(controls);
+            // window.addEventListener('resize', onWindowResize, false);
         }
-
+        // Render loop
         function animate() {
-            requestAnimationFrame(animate);
+            controls.update();
             renderer.render(scene, camera);
+            requestAnimationFrame(animate);
         }
 
-        function createGeometry() {
-            uRange = uMax - uMin;
-            vRange = vMax - vMin;
-            const meshFunction = function (u0, v0, vector) {
-                var u = uRange * u0 + uMin;
-                var v = vRange * v0 + vMin;
-                var x = xFunc(u, v);
-                var y = yFunc(u, v);
-                var z = zFunc(u, v);
 
-                if (isNaN(x) || isNaN(y) || isNaN(z))
-                    vector.set(0, 0, 0);
-                else
-                    vector.set(x, y, z);
 
-                return vector;
-            };
-            const graphGeometry = new THREE.ParametricGeometry(meshFunction, 20, 20);
-
-            graphGeometry.computeBoundingBox();
-            zMin = graphGeometry.boundingBox.min.z;
-            zMax = graphGeometry.boundingBox.max.z;
-            zRange = zMax - zMin;
-            let color, point, face, numberOfSides, vertexIndex;
-
-            const faceIndices = ['a', 'b', 'c', 'd'];
-
-            for (var i = 0; i < graphGeometry.vertices.length; i++) {
-                point = graphGeometry.vertices[i];
-                color = new THREE.Color(0x0000ff);
-                color.setHSL(0.7 * (zMax - point.z) / zRange, 1, 0.5);
-                graphGeometry.colors[i] = color;
-            }
-
-            for (var i = 0; i < graphGeometry.faces.length; i++) {
-                face = graphGeometry.faces[i];
-                numberOfSides = (face instanceof THREE.Face3) ? 3 : 4;
-                for (var j = 0; j < numberOfSides; j++) {
-                    vertexIndex = face[faceIndices[j]];
-                    face.vertexColors[j] = graphGeometry.colors[vertexIndex];
-                }
-            }
-
-            return graphGeometry;
-        }
-
-        function onOrientationEvent(e) {
-            if (new Date().getTime() - refreshIntervalStart > REFRESH_INTERVAL) {
-                const CONST = 360;
-
-                const alpha = e.alpha.toFixed(4) / CONST;
-                const beta = e.beta.toFixed(4) / CONST;
-                const gamma = e.gamma.toFixed(4) / CONST;
-
-                oalpha.textContent = alpha;
-                obeta.textContent = beta;
-                ogamma.textContent = gamma;
-
-                orientation.alpha = alpha;
-                orientation.beta = beta;
-                orientation.gamma = gamma;
-
-                camera.rotation.set(orientation.alpha, orientation.beta, orientation.gamma);
-
-                refreshIntervalStart = new Date().getTime();
-            }
-        }
-
-        window.addEventListener('deviceorientation', onOrientationEvent, true);
+        init();
+            animate();
     </script>
 </body>
 </html>
