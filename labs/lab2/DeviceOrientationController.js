@@ -20,7 +20,7 @@ var DeviceOrientationController = function(object, domElement) {
   this.enableManualDrag = true; // enable manual user drag override control by default
   this.enableManualZoom = true; // enable manual user zoom override control by default
 
-  this.useQuaternions = true; // use quaternions for orientation calculation by default
+  this.useQuaternions = false; // use quaternions for orientation calculation by default
 
   this.deviceOrientation = {};
   this.screenOrientation = window.orientation || 0;
@@ -439,8 +439,6 @@ var DeviceOrientationController = function(object, domElement) {
 
       // only process non-zero 3-axis data
       if (alpha !== 0 && beta !== 0 && gamma !== 0) {
-        alert(this.useQuaternions);
-
         if (this.useQuaternions) {
           deviceQuat = createQuaternion(alpha, beta, gamma, orient);
         } else {
