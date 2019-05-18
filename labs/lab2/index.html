@@ -45,6 +45,17 @@
             renderer.setSize(window.innerWidth, window.innerHeight);
             document.body.appendChild(renderer.domElement);
             // Add DeviceOrientation Controls
+
+
+            let geometry1 = createGeometry();
+            let material1 = new THREE.MeshNormalMaterial({
+                side: THREE.DoubleSide
+            });
+            const mesh1 = new THREE.Mesh(geometry1, material1);
+            mesh1.rotation.x = -90;
+            scene.add(mesh1);
+
+
             controls = new DeviceOrientationController(camera, renderer.domElement);
             controls.connect();
             // setupControllerEventHandlers(controls);
@@ -59,8 +70,52 @@
 
 
 
+
+        function createGeometry() {
+                uRange = uMax - uMin;
+                vRange = vMax - vMin;
+                const meshFunction = function (u0, v0, vector) {
+                    var u = uRange * u0 + uMin;
+                    var v = vRange * v0 + vMin;
+                    var x = xFunc(u, v);
+                    var y = yFunc(u, v);
+                    var z = zFunc(u, v);
+                    if (isNaN(x) || isNaN(y) || isNaN(z))
+                        vector.set(0, 0, 0);
+                    else
+                        vector.set(x, y, z);
+                    return vector;
+                };
+                const graphGeometry = new THREE.ParametricGeometry(meshFunction, 20, 20);
+                graphGeometry.computeBoundingBox();
+                zMin = graphGeometry.boundingBox.min.z;
+                zMax = graphGeometry.boundingBox.max.z;
+                zRange = zMax - zMin;
+                let color, point, face, numberOfSides, vertexIndex;
+                const faceIndices = ['a', 'b', 'c', 'd'];
+                for (var i = 0; i < graphGeometry.vertices.length; i++) {
+                    point = graphGeometry.vertices[i];
+                    color = new THREE.Color(0x0000ff);
+                    color.setHSL(0.7 * (zMax - point.z) / zRange, 1, 0.5);
+                    graphGeometry.colors[i] = color;
+                }
+                for (var i = 0; i < graphGeometry.faces.length; i++) {
+                    face = graphGeometry.faces[i];
+                    numberOfSides = (face instanceof THREE.Face3) ? 3 : 4;
+                    for (var j = 0; j < numberOfSides; j++) {
+                        vertexIndex = face[faceIndices[j]];
+                        face.vertexColors[j] = graphGeometry.colors[vertexIndex];
+                    }
+                }
+                return graphGeometry;
+            }
+
+
+
+
+
         init();
-            animate();
+        animate();
     </script>
 </body>
 </html>
