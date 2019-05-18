@@ -20,15 +20,14 @@
         </div>
     </div>
     <script>
-        const oalpha = document.getElementById('oalpha')
-        const obeta = document.getElementById('obeta')
-        const ogamma = document.getElementById('ogamma')
+        const oalpha = document.getElementById('oalpha');
+        const obeta = document.getElementById('obeta');
+        const ogamma = document.getElementById('ogamma');
 
-        const REFRESH_INTERVAL = 100;
-        let refreshIntervalStart = new Date().getTime();
+        const screenOrientation = window.orientation || 0;
 
-        const width = 640;
-        const height = 480;
+        const width = window.innerWidth;
+        const height = window.innerHeight;
         const xFunc = (u, v) => a * v * Math.sqrt(1 - v) * Math.cos(u);
         const yFunc = (u, v) => a * v * Math.sqrt(1 - v) * Math.sin(u);
         const zFunc = (u, v) => a * v;
@@ -226,10 +225,9 @@
             var deviceMatrix;
 
             return function () {
-
-                alpha = THREE.Math.degToRad(deviceOrientation.alpha || 0); // Z
-                beta = THREE.Math.degToRad(deviceOrientation.beta || 0); // X'
-                gamma = THREE.Math.degToRad(deviceOrientation.gamma || 0); // Y''
+                alpha = THREE.Math.degToRad(e.alpha || 0); // Z
+                beta = THREE.Math.degToRad(e.beta || 0); // X'
+                gamma = THREE.Math.degToRad(e.gamma || 0); // Y''
                 orient = THREE.Math.degToRad(screenOrientation || 0); // O
 
                 // only process non-zero 3-axis data
@@ -243,7 +241,12 @@
 
         }
 
+        function onScreenOrientationChange() {
+            screenOrientation = window.orientation || 0;
+        };
+
         window.addEventListener('deviceorientation', onOrientationEvent, true);
+        window.addEventListener('orientationchange', onScreenOrientationChange, true);
     </script>
 </body>
 
