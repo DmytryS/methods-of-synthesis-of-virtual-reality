@@ -23,7 +23,6 @@
         const oalpha = document.getElementById('oalpha');
         const obeta = document.getElementById('obeta');
         const ogamma = document.getElementById('ogamma');
-
         const screenOrientation = window.orientation || 0;
 
         const width = window.innerWidth;
@@ -32,11 +31,6 @@
         const yFunc = (u, v) => a * v * Math.sqrt(1 - v) * Math.sin(u);
         const zFunc = (u, v) => a * v;
         const a = 0.75, b = 1, c = 1, d = 1;
-        const orientation = {
-            alpha: 0,
-            beta: 0,
-            gamma: 0
-        };
 
         let deviceQuat = new THREE.Quaternion();
 
@@ -46,11 +40,7 @@
 
         var renderer, clock, deltaTime, totalTime;
 
-        var arToolkitSource, arToolkitContext;
-
-        var markerRoot1, markerRoot2;
-
-        var mesh1;
+        let mesh1;
         let camera;
         let scene;
 
@@ -62,18 +52,11 @@
             let ambientLight = new THREE.AmbientLight(0xcccccc, 0.5);
             scene.add(ambientLight);
 
-            // camera = new THREE.PerspectiveCamera(
-            //     // 45,
-            //     // width / height,
-            //     // 0.5,
-            //     // 20000
-            // );
             camera = new THREE.Camera();
             camera.rotation.order = 'YXZ';
-            // scene.add(camera);
 
             camera.lookAt(scene.position);
-            // camera.position.set(1,1,1);
+
             renderer = new THREE.WebGLRenderer({
                 antialias: true,
                 alpha: true
@@ -89,11 +72,8 @@
             let material1 = new THREE.MeshNormalMaterial({
                 side: THREE.DoubleSide
             });
-
             const mesh1 = new THREE.Mesh(geometry1, material1);
-
             mesh1.rotation.x = -90;
-
             scene.add(mesh1);
 
             animate();
@@ -108,11 +88,11 @@
             uRange = uMax - uMin;
             vRange = vMax - vMin;
             const meshFunction = function (u0, v0, vector) {
-                var u = uRange * u0 + uMin;
-                var v = vRange * v0 + vMin;
-                var x = xFunc(u, v);
-                var y = yFunc(u, v);
-                var z = zFunc(u, v);
+                let u = uRange * u0 + uMin;
+                let v = vRange * v0 + vMin;
+                let x = xFunc(u, v);
+                let y = yFunc(u, v);
+                let z = zFunc(u, v);
 
                 if (isNaN(x) || isNaN(y) || isNaN(z))
                     vector.set(0, 0, 0);
@@ -131,17 +111,17 @@
 
             const faceIndices = ['a', 'b', 'c', 'd'];
 
-            for (var i = 0; i < graphGeometry.vertices.length; i++) {
+            for (let i = 0; i < graphGeometry.vertices.length; i++) {
                 point = graphGeometry.vertices[i];
                 color = new THREE.Color(0x0000ff);
                 color.setHSL(0.7 * (zMax - point.z) / zRange, 1, 0.5);
                 graphGeometry.colors[i] = color;
             }
 
-            for (var i = 0; i < graphGeometry.faces.length; i++) {
+            for (let i = 0; i < graphGeometry.faces.length; i++) {
                 face = graphGeometry.faces[i];
                 numberOfSides = (face instanceof THREE.Face3) ? 3 : 4;
-                for (var j = 0; j < numberOfSides; j++) {
+                for (let j = 0; j < numberOfSides; j++) {
                     vertexIndex = face[faceIndices[j]];
                     face.vertexColors[j] = graphGeometry.colors[vertexIndex];
                 }
@@ -151,19 +131,13 @@
         }
 
         const createQuaternion = function () {
-
-                var finalQuaternion = new THREE.Quaternion();
-
-                var deviceEuler = new THREE.Euler();
-
-                var screenTransform = new THREE.Quaternion();
-
-                var worldTransform = new THREE.Quaternion(- Math.sqrt(0.5), 0, 0, Math.sqrt(0.5)); // - PI/2 around the x-axis
-
-                var minusHalfAngle = 0;
+                const finalQuaternion = new THREE.Quaternion();
+                const deviceEuler = new THREE.Euler();
+                const screenTransform = new THREE.Quaternion();
+                const worldTransform = new THREE.Quaternion(- Math.sqrt(0.5), 0, 0, Math.sqrt(0.5));
+                let minusHalfAngle = 0;
 
                 return function (alpha, beta, gamma, screenOrientation) {
-
                     deviceEuler.set(beta, alpha, - gamma, 'YXZ');
 
                     finalQuaternion.setFromEuler(deviceEuler);
@@ -177,70 +151,56 @@
                     finalQuaternion.multiply(worldTransform);
 
                     return finalQuaternion;
-
                 }
-
             }();
 
         const createRotationMatrix = function () {
+            const finalMatrix = new THREE.Matrix4();
+            const deviceEuler = new THREE.Euler();
+            const screenEuler = new THREE.Euler();
+            const worldEuler = new THREE.Euler(- Math.PI / 2, 0, 0, 'YXZ');
+            const screenTransform = new THREE.Matrix4();
+            const worldTransform = new THREE.Matrix4();
+            worldTransform.makeRotationFromEuler(worldEuler);
 
-                var finalMatrix = new THREE.Matrix4();
+            return function (alpha, beta, gamma, screenOrientation) {
+                deviceEuler.set(beta, alpha, - gamma, 'YXZ');
 
-                var deviceEuler = new THREE.Euler();
-                var screenEuler = new THREE.Euler();
-                var worldEuler = new THREE.Euler(- Math.PI / 2, 0, 0, 'YXZ'); // - PI/2 around the x-axis
+                finalMatrix.identity();
 
-                var screenTransform = new THREE.Matrix4();
+                finalMatrix.makeRotationFromEuler(deviceEuler);
 
-                var worldTransform = new THREE.Matrix4();
-                worldTransform.makeRotationFromEuler(worldEuler);
+                screenEuler.set(0, - screenOrientation, 0, 'YXZ');
 
-                return function (alpha, beta, gamma, screenOrientation) {
+                screenTransform.identity();
 
-                    deviceEuler.set(beta, alpha, - gamma, 'YXZ');
+                screenTransform.makeRotationFromEuler(screenEuler);
 
-                    finalMatrix.identity();
+                finalMatrix.multiply(screenTransform);
 
-                    finalMatrix.makeRotationFromEuler(deviceEuler);
+                finalMatrix.multiply(worldTransform);
 
-                    screenEuler.set(0, - screenOrientation, 0, 'YXZ');
+                return finalMatrix;
 
-                    screenTransform.identity();
-
-                    screenTransform.makeRotationFromEuler(screenEuler);
-
-                    finalMatrix.multiply(screenTransform);
-
-                    finalMatrix.multiply(worldTransform);
-
-                    return finalMatrix;
-
-                }
-
-            }();
+            }
+        }();
 
         function onOrientationEvent(e) {
-            var alpha, beta, gamma, orient;
-            var deviceMatrix;
-
-            alpha = THREE.Math.degToRad(e.alpha || 0); // Z
-            beta = THREE.Math.degToRad(e.beta || 0); // X'
-            gamma = THREE.Math.degToRad(e.gamma || 0); // Y''
-            orient = THREE.Math.degToRad(screenOrientation || 0); // O
+            const alpha = THREE.Math.degToRad(e.alpha || 0); // Z
+            const beta = THREE.Math.degToRad(-1*e.beta || 0); // X'
+            const gamma = THREE.Math.degToRad(e.gamma || 0); // Y''
+            const orient = THREE.Math.degToRad(screenOrientation || 0); // O
 
             oalpha.textContent = alpha;
             obeta.textContent = beta;
             ogamma.textContent = gamma;
 
-            // only process non-zero 3-axis data
             if (alpha !== 0 && beta !== 0 && gamma !== 0) {
-                deviceMatrix = createRotationMatrix(alpha, beta, gamma, orient);
+                const deviceMatrix = createRotationMatrix(alpha, beta, gamma, orient);
                 deviceQuat.setFromRotationMatrix(deviceMatrix);
 
-                // camera.quaternion.copy(deviceQuat);
                 camera.quaternion.copy(deviceQuat);
             }
-
         }
 
         function onScreenOrientationChange() {
