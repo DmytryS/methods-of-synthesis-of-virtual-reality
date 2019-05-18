@@ -235,7 +235,6 @@
                 deviceMatrix = createRotationMatrix(alpha, beta, gamma, orient);
 
                 deviceQuat.setFromRotationMatrix(deviceMatrix);
-                alert(deviceQuat);
                 // camera.quaternion.copy(deviceQuat);
                 camera.rotation.getRotationFromMatrix(deviceMatrix);
             }
