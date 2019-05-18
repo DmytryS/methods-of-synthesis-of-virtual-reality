@@ -233,7 +233,9 @@
             // only process non-zero 3-axis data
             if (alpha !== 0 && beta !== 0 && gamma !== 0) {
                 deviceMatrix = createRotationMatrix(alpha, beta, gamma, orient);
+
                 deviceQuat.setFromRotationMatrix(deviceMatrix);
+                alert(deviceQuat);
                 camera.quaternion.copy(deviceQuat);
             }
 
